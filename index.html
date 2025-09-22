@@ -29,13 +29,19 @@
             }
         }
         .card {
-            background-color: #fff;
+            background-color: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
             border-radius: 2rem;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05), 0 2px 10px rgba(0, 0, 0, 0.03);
             padding: 2rem;
             width: 100%;
             transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-            border: 1px solid #f0f4f9;
+            border: 1px solid rgba(240, 244, 249, 0.5);
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .card:hover {
             transform: translateY(-5px);
@@ -110,6 +116,27 @@
             0%, 100% { transform: scale(1); opacity: 1; }
             50% { transform: scale(1.5); opacity: 0.5; }
         }
+        .loading-text-container {
+            height: 32px;
+            overflow: hidden;
+            text-align: center;
+        }
+        .loading-text-container p {
+            animation: typing-text 8s infinite ease-in-out;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        @keyframes typing-text {
+            0% { transform: translateY(0); }
+            12.5% { transform: translateY(-32px); }
+            25% { transform: translateY(-64px); }
+            37.5% { transform: translateY(-96px); }
+            50% { transform: translateY(-128px); }
+            62.5% { transform: translateY(-160px); }
+            75% { transform: translateY(-192px); }
+            87.5% { transform: translateY(-224px); }
+            100% { transform: translateY(-256px); }
+        }
         
         .overview-header {
             background: linear-gradient(45deg, #D84281, #A0278A);
@@ -122,7 +149,6 @@
         @media (min-width: 768px) {
              .overview-header { font-size: 3rem; }
         }
-
         .action-item {
             background-color: #f7f9fc;
             border-left: 5px solid #D84281;
@@ -130,10 +156,21 @@
             padding: 1rem 1.5rem;
             margin-bottom: 1rem;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
         }
         .action-item:hover {
             transform: translateX(5px);
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+        .action-item-owner {
+            cursor: pointer;
+            text-decoration: none;
+            color: #8b5cf6;
+            transition: color 0.2s ease;
+        }
+        .action-item-owner:hover {
+            text-decoration: underline;
+            color: #6d28d9;
         }
         .tag {
             background-color: #fce8f8;
@@ -162,6 +199,14 @@
             text-align: center;
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
         }
+        .action-item {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+
+        .action-item:hover {
+            transform: scale(1.02);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 <body>
@@ -181,18 +226,33 @@
 
         <!-- Trạng thái Loading -->
         <div id="loadingUI" class="hidden card text-center flex flex-col items-center justify-center transition-opacity duration-500">
+            <div class="flex justify-center mb-8">
+                 <img src="https://img.mservice.com.vn/app/img/portal_documents/mini-app_design-guideline_branding-guide-1-2.png" alt="GenNote AI Logo" class="h-[100px] w-auto">
+            </div>
             <div class="loader-container">
                 <div class="loader-dots">
                     <div class="loader-dot"></div>
                     <div class="loader-dot"></div>
                     <div class="loader-dot"></div>
                 </div>
-                <p id="loadingText" class="text-gray-600 font-medium">Đang phân tích cuộc họp...</p>
+                <div class="loading-text-container">
+                    <p class="text-gray-600 font-medium">Đang lắng nghe...</p>
+                    <p class="text-gray-600 font-medium">Đang phân tích...</p>
+                    <p class="text-gray-600 font-medium">Đang trích xuất ý chính...</p>
+                    <p class="text-gray-600 font-medium">Đang tạo các mục hành động...</p>
+                    <p class="text-gray-600 font-medium">Đang tổng hợp tóm tắt...</p>
+                    <p class="text-gray-600 font-medium">Đang định dạng lại...</p>
+                    <p class="text-gray-600 font-medium">Đang hoàn tất...</p>
+                    <p class="text-gray-600 font-medium">Sắp xong rồi... Vui lòng đợi trong giây lát!</p>
+                </div>
             </div>
         </div>
 
         <!-- Giao diện Tổng quan và Chia sẻ -->
         <div id="overviewSection" class="hidden card transition-opacity duration-500">
+             <div class="flex justify-center mb-8">
+                <img src="https://img.mservice.com.vn/app/img/portal_documents/mini-app_design-guideline_branding-guide-1-2.png" alt="GenNote AI Logo" class="h-[250px] w-auto">
+            </div>
             <h2 class="overview-header mb-4 text-3xl sm:text-4xl">Tóm tắt Cuộc họp</h2>
             <div id="overviewContent" class="prose max-w-none mb-6">
                 <!-- Nội dung sẽ được tạo tại đây -->
@@ -231,15 +291,6 @@
 
             let generatedData = null;
 
-            const loadingMessages = [
-                "Đang phân tích cuộc họp...",
-                "Đang trích xuất các mục hành động...",
-                "Đang tạo tóm tắt cuối cùng...",
-                "Gần xong rồi... Vui lòng đợi trong giây lát!"
-            ];
-
-            let loadingInterval;
-
             processBtn.addEventListener('click', async () => {
                 const meetLink = meetLinkInput.value.trim();
                 if (meetLink === '' || (!meetLink.includes('meet.google.com') && !meetLink.includes('drive.google.com/file/d/') && !meetLink.includes('docs.google.com/videos/d/'))) {
@@ -249,12 +300,6 @@
 
                 mainUI.classList.add('hidden');
                 loadingUI.classList.remove('hidden');
-
-                let messageIndex = 0;
-                loadingInterval = setInterval(() => {
-                    loadingText.innerText = loadingMessages[messageIndex];
-                    messageIndex = (messageIndex + 1) % loadingMessages.length;
-                }, 2000);
 
                 try {
                     const apiData = await fetchSummaryFromAPI(meetLink);
@@ -266,114 +311,197 @@
                     showMessage('Đã xảy ra lỗi khi tạo tóm tắt. Vui lòng thử lại.');
                     loadingUI.classList.add('hidden');
                     mainUI.classList.remove('hidden');
-                } finally {
-                    clearInterval(loadingInterval);
                 }
             });
 
-            // This function fetches the summary from the API
-            // NOTE: This method of storing API keys is NOT secure.
-            // For a production application, these keys should be stored on a backend server.
-            async function fetchSummaryFromAPI(link) {
-                const part1 = "sk-eH6izc";
-                const part2 = "HCM7cfoB4CVAFk9";
-                const part3 = "oT57nwJr9rdRH167auFGdFcswoB";
-                const apiKey = part1 + part2 + part3;
+            const allTasks = [
+                "[BILLPAY-1101] Revamp Home 2025",
+                "[BILLPAY-1102] Optimize luồng retry payment",
+                "[BILLPAY-1103] New auto check pending",
+                "[BILLPAY-1104] New auto check pending EVN_HN, EVN_NPC",
+                "[BILLPAY-1105] Luồng ĐKNTCC EVN SPC (Phase 1)",
+                "[BILLPAY-1106] Revamp KQGD",
+                "[BILLPAY-1107] Auto debit luồng check pending",
+                "[BILLPAY-1108] Apply check pending cho EVN Hà Nội & EVNNPC cuối ngày T+1",
+                "[BILLPAY-1109] Apply errorCode 01 luồng retry payment cho VNPT toàn quốc & Vina HCM",
+                "[BILLPAY-1110] Chặn luồng xoá bill chính chủ VTS",
+                "[BILLPAY-1111] Support Moni tích hợp API So sánh hoá đơn",
+                "[BILLPAY-1112] Internet Lắp đặt FPT - Update gói combo",
+                "[BILLPAY-1113] Internet Lắp đặt FPT - Update gói camera",
+                "[BILLPAY-1114] Mở mass job auto check pending",
+                "[BILLPAY-1115] Testing N2MM",
+                "[BILLPAY-1116] Hot fix So sánh cùng khu vực",
+                "[BILLPAY-1117] Event tracking BTS đổi hạn mức Auto debit",
+                "[BILLPAY-1118] Fix lỗi UI miniApp Đăng ký lắp đặt internet FPT",
+                "[BILLPAY-1119] BTS thay đổi hạn mức AD",
+                "[BILLPAY-1120] Revamp Add Bill Nhập mã KH",
+                "[BILLPAY-1121] Upgrade remind + noti",
+                "[BILLPAY-1122] New implement remind AI + A/B test bill ranking",
+                "[BILLPAY-1123] Optimize location của internet FPT & Viettel",
+                "[BILLPAY-1124] AD update MH TTAT & KQGD",
+                "[BILLPAY-1125] Revamp Add Bill chọn NCC",
+                "[BILLPAY-1126] Revamp Add Bill Bill detail",
+                "[BILLPAY-1127] Field ngày hết hạn",
+                "[BILLPAY-1128] Optimize cron job",
+                "[BILLPAY-1129] Update project to JDK 17",
+                "[BILLPAY-1130] Billpay on web",
+                "[BILLPAY-1131] ADD BILL AI phase 2",
+                "[BILLPAY-1132] Viettel Thanh toán toàn bộ nợ cước",
+                "[BILLPAY-1133] Tối ưu performance bottom sheet Biz page",
+                "[BILLPAY-1134] Phân tải NCC VDS, CDS",
+                "[BILLPAY-1135] Update saved bill + button Viettel",
+                "[BILLPAY-1136] Improve Biz Page Đăng ký nhận tin- Điều chỉnh UI",
+                "[BILLPAY-1137] Lắp đặt internet FPT - Update thông tin tỉnh/quận/phường",
+                "[BILLPAY-1138] Xác thực sinh trắc học NFC _ Phase 3",
+                "[BILLPAY-1139] Chuyển config từ global config về config webadmin.",
+                "[BILLPAY-1140] Bổ sung popup nâng hạng, giải vàng, giải bạch kim của game",
+                "[BILLPAY-1141] GTBB via MoMo Chat",
+                "[BILLPAY-1142] Optimize auto debit",
+                "[BILLPAY-1143] Optimize API get vip game, giảm thời gian xử lý",
+                "[BILLPAY-1144] Đăng ký lắp đặt Internet_Bổ sung thông tin lắp đặt Internet trên CRM",
+                "[BILLPAY-1145] Move API FIND_RECEIVER_PROFILE qua gateway p2p",
+                "[BILLPAY-1146] Nhắc nợ chủ động",
+                "[BILLPAY-1147] Bổ sung duedate ở Home Billpay và Bill detail",
+                "[BILLPAY-1148] Backfill data bill amount",
+                "[BILLPAY-1149] Báo cáo hóa đơn",
+                "[BILLPAY-1150] Báo lịch cắt/mở điện",
+                "[BILLPAY-1151] Auto setup time of Game",
+                "[BILLPAY-1152] Lỗi P03 crash app do màn hình on-boarding share bill",
+                "[BILLPAY-1153] Plan optimize performance",
+                "[BILLPAY-1154] Auto debit Viettel",
+                "[BILLPAY-1155] Share bill mở thêm dịch vụ internet, truyền hình",
+                "[BILLPAY-1156] EVN CPC nhắc nợ chủ động",
+                "[BILLPAY-1157] Multi bill luồng thu phí khác",
+                "[BILLPAY-1158] VTS phase 2 trả góp",
+                "[BILLPAY-1159] Báo cáo hóa đơn, so sánh cùng khu vực",
+                "[BILLPAY-1160] Mở Autodebit full service",
+                "[BILLPAY-1161] Game Update content nhiệm vụ",
+                "[BILLPAY-1162] Update project to JDK17",
+                "[BILLPAY-1163] Chuyển đổi luồng đối soát từ VM lên K8S",
+                "[BILLPAY-1164] App Platform ver 5.0",
+                "[BILLPAY-1165] Build Web Admin Billpay",
+                "[BILLPAY-1166] Build feature monitor/checking HM trên Web Admin Billpay",
+                "[BILLPAY-1167] Xử lý list gd pending check bill manual EVN HANOI",
+                "[BILLPAY-1168] Appy luồng retry payment cho EVN NINHTHUAN",
+                "[BILLPAY-1169] EVN SPC - Check List GD lệch trạng thái",
+                "[BILLPAY-1170] EVN SPC - Update status pending thành failled cho mã lỗi -1",
+                "[BILLPAY-1171] EVN SPC - Review & nghiệm thu luồng TraCuuThanhToan",
+                "[BILLPAY-1172] Tích hợp API check pending CITYWORK",
+                "[BILLPAY-1173] Upgrade API mới DAWACO",
+                "[BILLPAY-1174] Update API Nước Tân Hòa",
+                "[BILLPAY-1175] Update mã KH mới phumy_water",
+                "[BILLPAY-1176] Update tên dịch vụ yenbai_water",
+                "[BILLPAY-1177] Optimize luồng đối soát tự động VNPT toàn quốc",
+                "[BILLPAY-1178] Review các dịch vụ và OFF tính năng Remind",
+                "[BILLPAY-1179] Kết nối mới Nước sạch Việt Thanh",
+                "[BILLPAY-1180] EVNSPC - Update logic map agent theo mã đơn vị mới",
+                "[BILLPAY-1181] Bổ sung đơn vị mới EVN SPC"
+            ];
+            const tasksByTag = {
+                'backend': allTasks.filter(task => task.includes('- BE') || task.includes('System') || task.includes('Platform')),
+                'app': allTasks.filter(task => task.includes('- APP') || task.includes('- FE') || task.includes('Platform')),
+                'qa': allTasks.filter(task => task.includes('- QC')),
+                'general': allTasks.filter(task => !task.includes('- BE') && !task.includes('- APP') && !task.includes('- FE') && !task.includes('- QC') && !task.includes('System') && !task.includes('Platform'))
+            };
 
-                const urlPart1 = "https://gpt5.shupremium.com/v1";
-                const urlPart2 = "/chat/completions";
-                const apiUrl = urlPart1 + urlPart2;
+            const peopleByRole = {
+                'backend': ["Phú", "Phúc", "Bão", "Hoàng"],
+                'app': ["Hiền", "Tiến"],
+                'qa': ["Ánh", "Khải"],
+                'leader': ["Nghĩa"]
+            };
+            const allTeamMembers = [...peopleByRole.backend, ...peopleByRole.app, ...peopleByRole.qa, ...peopleByRole.leader];
+            const chatLinks = {}; // Đã xóa link của Bão
 
-                // Cấu hình prompt một cách rõ ràng và dễ thay đổi
-                const promptConfig = {
-                    topic: "phát triển tính năng thanh toán hóa đơn (billpay) cho các dịch vụ điện, nước, internet, và tích hợp với ví điện tử MoMo.",
-                    names: ["Phú", "Phúc", "Bão", "Ánh", "Khải", "Hoàng", "Nghĩa (đóng vai trò leader)"],
-                    dueDays: "vài ngày hoặc một tuần",
-                    tasksPerPerson: "2 đến 3"
-                };
-
-                const namesString = promptConfig.names.join(', ');
-
-                const prompt = `Giả lập việc tóm tắt nội dung cuộc họp từ một bản ghi video. Nội dung cuộc họp liên quan đến ${promptConfig.topic}. Hãy tạo một bản tóm tắt cuộc họp chi tiết hơn.
-
-Sử dụng các tên tiếng Việt sau cho trường 'owner': ${namesString}.
-
-Hạn chót cho các mục hành động phải cách ngày hiện tại ${promptConfig.dueDays}.
-Mỗi người phải có ${promptConfig.tasksPerPerson} mục hành động, mỗi mục dài 1-3 dòng.
-
-Định dạng đầu ra phải là một đối tượng JSON:
-{
-    "overview": "Tóm tắt chi tiết nội dung cuộc họp, bao gồm các quyết định chính về tính năng thanh toán hóa đơn (ví dụ: ưu tiên điện, nước trước, tích hợp MoMo).",
-    "actionItems": [
-        {
-            "owner": "Tên người chịu trách nhiệm",
-            "tasks": [
-                {
-                    "task": "Mô tả công việc chi tiết hơn, dài 1-3 dòng.",
-                    "due": "Hạn chót (ví dụ: 27/09/2025)",
-                    "tag": "Nhãn công việc (ví dụ: backend, frontend, design, qa, docs)"
-                }
-            ]
-        }
-    ]
-}
-
-Hãy đảm bảo output chỉ là đối tượng JSON hợp lệ và không chứa bất kỳ văn bản nào khác. Nội dung phải có vẻ tự nhiên và chuyên nghiệp như một cuộc họp thực tế.`;
-                
-                const payload = {
-                    "model": "gpt-3.5-turbo",
-                    "messages": [
-                        {
-                            "role": "system",
-                            "content": "Bạn là một trợ lý AI chuyên tóm tắt các cuộc họp và trích xuất các mục hành động một cách rõ ràng và ngắn gọn."
-                        },
-                        {
-                            "role": "user",
-                            "content": prompt
-                        }
-                    ],
-                    "response_format": { "type": "json_object" }
-                };
-
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiKey}`
-                    },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) {
-                    throw new Error(`Lỗi API: ${response.statusText}`);
-                }
-
-                const data = await response.json();
-                const content = JSON.parse(data.choices[0].message.content);
-                return content;
+            function getRandomTasksForPerson(role, count) {
+                const availableTasks = tasksByTag[role] || tasksByTag['general'];
+                const shuffled = [...availableTasks].sort(() => 0.5 - Math.random());
+                return shuffled.slice(0, count);
             }
 
-            // This function renders the summary on the UI
+            function getRandomDate(daysAhead) {
+                const date = new Date();
+                date.setDate(date.getDate() + Math.floor(Math.random() * daysAhead) + 2);
+                return date.toLocaleDateString('vi-VN');
+            }
+
+            async function fetchSummaryFromAPI(link) {
+                const attendingMembers = [...allTeamMembers].sort(() => 0.5 - Math.random());
+                const offMembers = attendingMembers.splice(0, Math.floor(Math.random() * 2) + 1);
+
+                const apiResponse = {
+                    "overview": `Trong cuộc họp Daily Meeting sáng nay, team đã cập nhật tiến độ các task. Mọi người đều rất tập trung vào việc tối ưu luồng thanh toán và nâng cấp giao diện. Đặc biệt, **${offMembers.join(' và ')}** đã vắng mặt vì lý do cá nhân nhưng đã gửi thông tin cập nhật trước. Team đã thống nhất đẩy nhanh tiến độ cho các task quan trọng trong tuần.`,
+                    "actionItems": []
+                };
+
+                attendingMembers.forEach(name => {
+                    let role = 'general';
+                    if (peopleByRole.backend.includes(name)) role = 'backend';
+                    if (peopleByRole.app.includes(name)) role = 'app';
+                    if (peopleByRole.qa.includes(name)) role = 'qa';
+                    if (peopleByRole.leader.includes(name)) role = 'leader';
+
+                    const numTasks = Math.floor(Math.random() * 3) + 1;
+                    const tasks = getRandomTasksForPerson(role, numTasks).map(task => {
+                        return {
+                            task: task,
+                            due: getRandomDate(10),
+                            tag: role
+                        };
+                    });
+
+                    apiResponse.actionItems.push({
+                        owner: name,
+                        tasks: tasks
+                    });
+                });
+
+                // Add off members to actionItems with an empty tasks array
+                offMembers.forEach(name => {
+                    apiResponse.actionItems.push({
+                        owner: name,
+                        tasks: [],
+                        isOff: true
+                    });
+                });
+
+                return new Promise(resolve => {
+                    const loadingTime = Math.random() * 3000 + 5000;
+                    setTimeout(() => {
+                        resolve(apiResponse);
+                    }, loadingTime);
+                });
+            }
+
             function renderSummary(apiData) {
                 const title = `Tóm tắt Cuộc họp - ${new Date().toLocaleDateString('vi-VN')}`;
                 
                 let actionItemsHtml = apiData.actionItems.map(item => {
-                    const taskList = item.tasks.map(task => `
-                        <li>
-                            <p class="text-gray-700 font-semibold text-lg mb-1">${task.task}</p>
-                            <p class="text-sm text-gray-500 mt-2">
-                                ${task.due ? `Hạn chót: <span class="text-gray-700 font-medium">${task.due}</span>` : ''}
-                                ${task.tag ? `<span class="tag ml-4">#${task.tag}</span>` : ''}
-                            </p>
-                        </li>
-                    `).join('');
+                    let taskListHtml = '';
+                    if (item.isOff) {
+                        taskListHtml = `<p class="text-gray-700 italic">Hôm nay off</p>`;
+                    } else {
+                        const taskList = item.tasks.map(task => `
+                            <li>
+                                <p class="text-gray-700 font-semibold text-lg mb-1">${task.task}</p>
+                                <p class="text-sm text-gray-500 mt-2">
+                                    ${task.due ? `Hạn chót: <span class="text-gray-700 font-medium">${task.due}</span>` : ''}
+                                    ${task.tag ? `<span class="tag ml-4">#${task.tag}</span>` : ''}
+                                </p>
+                            </li>
+                        `).join('');
+                        taskListHtml = `<ul class="list-disc ml-6 space-y-4">${taskList}</ul>`;
+                    }
+                    
+                    const ownerLink = chatLinks[item.owner] ? chatLinks[item.owner] : `javascript:void(0)`;
+                    const ownerTarget = chatLinks[item.owner] ? '_blank' : '_self';
 
                     return `
                         <div class="action-item">
-                            <h5 class="text-purple-600 font-bold text-xl mb-2">@${item.owner}</h5>
-                            <ul class="list-disc ml-6 space-y-4">
-                                ${taskList}
-                            </ul>
+                            <h5 class="text-purple-600 font-bold text-xl mb-2">
+                                <a href="${ownerLink}" class="action-item-owner" target="${ownerTarget}" data-owner="${item.owner}">@${item.owner}</a>
+                            </h5>
+                            ${taskListHtml}
                         </div>
                     `;
                 }).join('');
@@ -391,9 +519,18 @@ Hãy đảm bảo output chỉ là đối tượng JSON hợp lệ và không ch
 
                 loadingUI.classList.add('hidden');
                 overviewSection.classList.remove('hidden');
+
+                document.querySelectorAll('.action-item-owner').forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        const owner = e.target.dataset.owner;
+                        if (!chatLinks[owner]) {
+                             e.preventDefault();
+                             showMessage(`Link chat với ${owner} chưa được thiết lập. Vui lòng thử lại sau.`);
+                        }
+                    });
+                });
             }
 
-            // This function returns to the main input screen
             backToHomeBtn.addEventListener('click', () => {
                 overviewSection.classList.add('hidden');
                 mainUI.classList.remove('hidden');
@@ -401,9 +538,6 @@ Hãy đảm bảo output chỉ là đối tượng JSON hợp lệ và không ch
                 generatedData = null;
             });
 
-            // This function sends the summary to the group chat
-            // NOTE: This method of storing API keys is NOT secure.
-            // For a production application, this should be handled on a backend server.
             sendToChatBtn.addEventListener('click', async () => {
                 if (!generatedData) {
                     showMessage('Không có dữ liệu để gửi.');
@@ -419,12 +553,16 @@ Hãy đảm bảo output chỉ là đối tượng JSON hợp lệ và không ch
                 
                 generatedData.actionItems.forEach(person => {
                     message += `\n*@${person.owner}*:\n`;
-                    person.tasks.forEach(task => {
-                        message += `- ${task.task} ` +
-                                      (task.due ? `(Hạn chót: ${task.due}) ` : '') +
-                                      (task.tag ? `[#${task.tag}]` : '') +
-                                      `\n`;
-                    });
+                    if (person.isOff) {
+                         message += `(Hôm nay off)\n`;
+                    } else {
+                        person.tasks.forEach(task => {
+                            message += `- ${task.task} ` +
+                                          (task.due ? `(Hạn chót: ${task.due}) ` : '') +
+                                          (task.tag ? `[#${task.tag}]` : '') +
+                                          `\n`;
+                        });
+                    }
                 });
 
                 try {
@@ -446,13 +584,11 @@ Hãy đảm bảo output chỉ là đối tượng JSON hợp lệ và không ch
                 }
             });
 
-            // This function displays a custom modal message
             function showMessage(message) {
                 messageText.innerText = message;
                 messageModal.classList.remove('hidden');
             }
 
-            // This function closes the custom modal
             closeModalBtn.addEventListener('click', () => {
                 messageModal.classList.add('hidden');
             });
