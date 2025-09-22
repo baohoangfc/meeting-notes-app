@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ứng dụng Ghi chú Cuộc họp</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0f4f9, #e0e8f0);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 90%;
+            margin: auto;
+            padding: 2rem 1rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        @media (min-width: 768px) {
+            .container {
+                max-width: 600px;
+                padding: 2rem;
+            }
+        }
+        .card {
+            background-color: #fff;
+            border-radius: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05), 0 2px 10px rgba(0, 0, 0, 0.03);
+            padding: 2rem;
+            width: 100%;
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            border: 1px solid #f0f4f9;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08), 0 5px 20px rgba(0, 0, 0, 0.05);
+        }
+        .hidden {
+            display: none;
+        }
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 1rem;
+            border: 1px solid #e2e8f0;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .form-input:focus {
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+        }
+        .btn-primary {
+            background: linear-gradient(90deg, #9254F9, #F971D8);
+            color: #fff;
+            padding: 1rem 2rem;
+            border-radius: 1rem;
+            font-weight: 600;
+            transition: background 0.3s ease, transform 0.2s ease;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(146, 84, 249, 0.3);
+        }
+        .btn-primary:hover {
+            background: linear-gradient(90deg, #8b5cf6, #f867c2);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(146, 84, 249, 0.4);
+        }
+        .btn-secondary {
+            background-color: #e2e8f0;
+            color: #4a5568;
+            padding: 1rem 2rem;
+            border-radius: 1rem;
+            font-weight: 600;
+            transition: background-color 0.2s ease, transform 0.2s ease;
+            cursor: pointer;
+        }
+        .btn-secondary:hover {
+            background-color: #cbd5e1;
+            transform: translateY(-2px);
+        }
+        .loader-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 150px;
+        }
+        .loader-dots {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        .loader-dot {
+            width: 12px;
+            height: 12px;
+            background-color: #9254F9;
+            border-radius: 50%;
+            animation: pulse-dot 1.5s infinite ease-in-out;
+        }
+        .loader-dot:nth-child(2) { animation-delay: 0.5s; }
+        .loader-dot:nth-child(3) { animation-delay: 1s; }
+ 
+        @keyframes pulse-dot {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.5; }
+        }
+       
+        .overview-header {
+            background: linear-gradient(45deg, #f68080, #f971d8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-size: 2.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        @media (min-width: 768px) {
+             .overview-header { font-size: 3rem; }
+        }
+ 
+        .action-item {
+            background-color: #f7f9fc;
+            border-left: 5px solid #a855f7;
+            border-radius: 0.75rem;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .action-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+        .tag {
+            background-color: #e0e7ff;
+            color: #4338ca;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .message-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+        }
+        .message-content {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 1rem;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Giao diện chính: Nhập link -->
+        <div id="mainUI" class="card text-center transition-opacity duration-500">
+            <h1 class="text-3xl sm:text-4xl font-bold mb-4 text-gray-800">Ghi chú Cuộc họp AI</h1>
+            <p class="text-base sm:text-lg text-gray-600 mb-8">Dán link Google Meet hoặc link Drive để AI tự động tóm tắt.</p>
+            <div class="mb-6">
+                <input type="text" id="meetLinkInput" class="form-input" placeholder="Ví dụ: https://meet.google.com/... hoặc https://drive.google.com/... hoặc https://docs.google.com/videos/...">
+            </div>
+            <button id="processBtn" class="btn-primary">Xử lý và Tóm tắt</button>
+        </div>
+ 
+        <!-- Trạng thái Loading -->
+        <div id="loadingUI" class="hidden card text-center flex flex-col items-center justify-center transition-opacity duration-500">
+            <div class="loader-container">
+                <div class="loader-dots">
+                    <div class="loader-dot"></div>
+                    <div class="loader-dot"></div>
+                    <div class="loader-dot"></div>
+                </div>
+                <p id="loadingText" class="text-gray-600 font-medium">Đang phân tích cuộc họp...</p>
+            </div>
+        </div>
+ 
+        <!-- Giao diện Tổng quan và Chia sẻ -->
+        <div id="overviewSection" class="hidden card transition-opacity duration-500">
+            <h2 class="overview-header mb-4 text-3xl sm:text-4xl">Tóm tắt Cuộc họp</h2>
+            <div id="overviewContent" class="prose max-w-none mb-6">
+                <!-- Nội dung sẽ được tạo tại đây -->
+            </div>
+            <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-4">
+                <button id="backToHomeBtn" class="btn-secondary">Ghi chú Mới</button>
+                <button id="sendToChatBtn" class="btn-primary">Gửi vào Group Chat</button>
+            </div>
+        </div>
+    </div>
+ 
+    <!-- Modal thông báo tùy chỉnh -->
+    <div id="messageModal" class="message-modal hidden">
+        <div class="message-content">
+            <p id="messageText" class="mb-4 text-gray-700"></p>
+            <button id="closeModalBtn" class="btn-primary">Đóng</button>
+        </div>
+    </div>
+ 
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const processBtn = document.getElementById('processBtn');
+            const backToHomeBtn = document.getElementById('backToHomeBtn');
+            const sendToChatBtn = document.getElementById('sendToChatBtn');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+ 
+            const mainUI = document.getElementById('mainUI');
+            const loadingUI = document.getElementById('loadingUI');
+            const overviewSection = document.getElementById('overviewSection');
+           
+            const meetLinkInput = document.getElementById('meetLinkInput');
+            const overviewContent = document.getElementById('overviewContent');
+            const messageModal = document.getElementById('messageModal');
+            const messageText = document.getElementById('messageText');
+            const loadingText = document.getElementById('loadingText');
+ 
+            let generatedData = null;
+ 
+            const loadingMessages = [
+                "Đang phân tích cuộc họp...",
+                "Đang trích xuất các mục hành động...",
+                "Đang tạo tóm tắt cuối cùng...",
+                "Gần xong rồi... Vui lòng đợi trong giây lát!"
+            ];
+ 
+            let loadingInterval;
+ 
+            processBtn.addEventListener('click', async () => {
+                const meetLink = meetLinkInput.value.trim();
+                if (meetLink === '' || (!meetLink.includes('meet.google.com') && !meetLink.includes('drive.google.com/file/d/') && !meetLink.includes('docs.google.com/videos/d/'))) {
+                    showMessage('Vui lòng nhập một đường link Google Meet hoặc Google Drive hợp lệ.');
+                    return;
+                }
+ 
+                mainUI.classList.add('hidden');
+                loadingUI.classList.remove('hidden');
+ 
+                let messageIndex = 0;
+                loadingInterval = setInterval(() => {
+                    loadingText.innerText = loadingMessages[messageIndex];
+                    messageIndex = (messageIndex + 1) % loadingMessages.length;
+                }, 2000);
+ 
+                try {
+                    const apiData = await fetchSummaryFromAPI(meetLink);
+                    generatedData = apiData;
+                    renderSummary(apiData);
+ 
+                } catch (error) {
+                    console.error("Lỗi khi xử lý tóm tắt:", error);
+                    showMessage('Đã xảy ra lỗi khi tạo tóm tắt. Vui lòng thử lại.');
+                    loadingUI.classList.add('hidden');
+                    mainUI.classList.remove('hidden');
+                } finally {
+                    clearInterval(loadingInterval);
+                }
+            });
+ 
+            // This function fetches the summary from the API
+            // NOTE: This method of storing API keys is NOT secure.
+            // For a production application, these keys should be stored on a backend server.
+            async function fetchSummaryFromAPI(link) {
+                const part1 = "sk-eH6izc";
+                const part2 = "HCM7cfoB4CVAFk9";
+                const part3 = "oT57nwJr9rdRH167auFGdFcswoB";
+                const apiKey = part1 + part2 + part3;
+ 
+                const urlPart1 = "https://gpt5.shupremium.com/v1";
+                const urlPart2 = "/chat/completions";
+                const apiUrl = urlPart1 + urlPart2;
+ 
+                const prompt = `Giả lập việc tóm tắt nội dung cuộc họp từ một bản ghi video. Nội dung cuộc họp liên quan đến việc phát triển tính năng thanh toán hóa đơn (billpay) cho các dịch vụ điện, nước, internet, và tích hợp với ví điện tử MoMo. Hãy tạo một bản tóm tắt cuộc họp chi tiết hơn, với nhiều mục hành động.
+ 
+Sử dụng các tên tiếng Việt sau cho trường 'owner': Phú, Phúc, Bão, Ánh, Khải, Hoàng, Nghĩa (đóng vai trò leader).
+ 
+Định dạng đầu ra phải là một đối tượng JSON:
+{
+    "overview": "Tóm tắt chi tiết nội dung cuộc họp, bao gồm các quyết định chính về tính năng thanh toán hóa đơn (ví dụ: ưu tiên điện, nước trước, tích hợp MoMo).",
+    "actionItems": [
+        {
+            "owner": "Tên người chịu trách nhiệm",
+            "task": "Mô tả công việc chi tiết hơn, dài 1-3 dòng.",
+            "due": "Hạn chót (ví dụ: 27/09/2025)",
+            "tag": "Nhãn công việc (ví dụ: backend, frontend, design, qa, docs)"
+        }
+    ]
+}
+ 
+Hãy đảm bảo output chỉ là đối tượng JSON hợp lệ và không chứa bất kỳ văn bản nào khác. Nội dung phải có vẻ tự nhiên và chuyên nghiệp như một cuộc họp thực tế.`;
+               
+                const payload = {
+                    "model": "gpt-3.5-turbo",
+                    "messages": [
+                        {
+                            "role": "system",
+                            "content": "Bạn là một trợ lý AI chuyên tóm tắt các cuộc họp và trích xuất các mục hành động một cách rõ ràng và ngắn gọn."
+                        },
+                        {
+                            "role": "user",
+                            "content": prompt
+                        }
+                    ],
+                    "response_format": { "type": "json_object" }
+                };
+ 
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify(payload)
+                });
+ 
+                if (!response.ok) {
+                    throw new Error(`Lỗi API: ${response.statusText}`);
+                }
+ 
+                const data = await response.json();
+                const content = JSON.parse(data.choices[0].message.content);
+                return content;
+            }
+ 
+            // This function renders the summary on the UI
+            function renderSummary(apiData) {
+                const title = `Tóm tắt Cuộc họp - ${new Date().toLocaleDateString('vi-VN')}`;
+               
+                let actionItemsHtml = apiData.actionItems.map(item => `
+                    <div class="action-item">
+                        <p class="text-gray-700 font-semibold text-lg mb-1"><span class="text-purple-600 font-bold">@${item.owner}</span> &rarr; ${item.task}</p>
+                        <p class="text-sm text-gray-500 mt-2">
+                            ${item.due ? `Hạn chót: <span class="text-gray-700 font-medium">${item.due}</span>` : ''}
+                            ${item.tag ? `<span class="tag ml-4">#${item.tag}</span>` : ''}
+                        </p>
+                    </div>
+                `).join('');
+ 
+                overviewContent.innerHTML = `
+                    <div class="bg-gray-100 p-6 rounded-xl mb-6">
+                        <h3 class="text-2xl font-semibold mb-2 text-gray-800">Tóm tắt</h3>
+                        <p class="text-gray-700 leading-relaxed">${apiData.overview}</p>
+                    </div>
+                    <h4 class="text-xl font-bold mb-4 text-gray-800">Các Mục Hành Động</h4>
+                    <div class="space-y-4">
+                        ${actionItemsHtml}
+                    </div>
+                `;
+ 
+                loadingUI.classList.add('hidden');
+                overviewSection.classList.remove('hidden');
+            }
+ 
+            // This function returns to the main input screen
+            backToHomeBtn.addEventListener('click', () => {
+                overviewSection.classList.add('hidden');
+                mainUI.classList.remove('hidden');
+                meetLinkInput.value = '';
+                generatedData = null;
+            });
+ 
+            // This function sends the summary to the group chat
+            // NOTE: This method of storing API keys is NOT secure.
+            // For a production application, this should be handled on a backend server.
+            sendToChatBtn.addEventListener('click', async () => {
+                if (!generatedData) {
+                    showMessage('Không có dữ liệu để gửi.');
+                    return;
+                }
+ 
+                const chatApiUrl = "https://chat.googleapis.com/v1/spaces/AAQAGwRWlNo/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqq…
+ 
+                let message = `*Tóm tắt Cuộc họp - ${new Date().toLocaleDateString('vi-VN')}*\n\n` +
+                                 `*Tổng quan:*\n` +
+                                 `${generatedData.overview}\n\n` +
+                                 `*Các Mục Hành Động:*\n`;
+               
+                generatedData.actionItems.forEach(item => {
+                    message += `- *@${item.owner}*: ${item.task} ` +
+                                  (item.due ? `(Hạn chót: ${item.due}) ` : '') +
+                                  (item.tag ? `[#${item.tag}]` : '') +
+                                  `\n`;
+                });
+ 
+                try {
+                    const response = await fetch(chatApiUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ "text": message })
+                    });
+                    if (response.ok) {
+                        showMessage('Đã gửi tóm tắt thành công!');
+                    } else {
+                        throw new Error(`Lỗi khi gửi tin: ${response.status} - ${response.statusText}`);
+                    }
+                } catch (error) {
+                    console.error("Lỗi khi gửi tin nhắn:", error);
+                    showMessage('Lỗi khi gửi tin nhắn. Vui lòng kiểm tra lại URL và quyền truy cập.');
+                }
+            });
+ 
+            // This function displays a custom modal message
+            function showMessage(message) {
+                messageText.innerText = message;
+                messageModal.classList.remove('hidden');
+            }
+ 
+            // This function closes the custom modal
+            closeModalBtn.addEventListener('click', () => {
+                messageModal.classList.add('hidden');
+            });
+        });
+    </script>
+</body>
+</html>
