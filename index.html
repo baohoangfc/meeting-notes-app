@@ -6,268 +6,238 @@
     <title>GenNote AI</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
+        :root {
+            --bg-gradient-start: #f0f4f9;
+            --bg-gradient-end: #e0e8f0;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --card-border: rgba(240, 244, 249, 0.5);
+            --text-primary: #1a202c;
+            --text-secondary: #4a5568;
+            --input-bg: #fff;
+            --input-border: #e2e8f0;
+            --btn-secondary-bg: #e2e8f0;
+            --btn-secondary-text: #4a5568;
+            --btn-secondary-hover-bg: #cbd5e1;
+            --action-item-bg: #f7f9fc;
+            --action-item-border: #D84281;
+            --overview-box-bg: #f1f5f9;
+            --tag-bg: #fce8f8;
+            --tag-text: #A0278A;
+            --modal-bg: #fff;
+        }
+
+        html.dark {
+            --bg-gradient-start: #1a202c;
+            --bg-gradient-end: #2d3748;
+            --card-bg: rgba(45, 55, 72, 0.8);
+            --card-border: rgba(74, 85, 104, 0.5);
+            --text-primary: #f7fafc;
+            --text-secondary: #a0aec0;
+            --input-bg: #2d3748;
+            --input-border: #4a5568;
+            --btn-secondary-bg: #4a5568;
+            --btn-secondary-text: #f7fafc;
+            --btn-secondary-hover-bg: #2d3748;
+            --action-item-bg: #2d3748;
+            --action-item-border: #D84281;
+            --overview-box-bg: #1a202c;
+            --tag-bg: #4a5568;
+            --tag-text: #f7fafc;
+            --modal-bg: #2d3748;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f0f4f9, #e0e8f0);
+            background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
             min-height: 100vh;
+            color: var(--text-primary);
+            transition: background 0.3s ease-in-out, color 0.3s ease-in-out;
         }
-        .container {
-            max-width: 90%;
-            margin: auto;
-            padding: 2rem 1rem;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-        @media (min-width: 768px) {
-            .container {
-                max-width: 600px;
-                padding: 2rem;
-            }
-        }
+        .container { max-width: 90%; margin: auto; padding: 2rem 1rem; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        @media (min-width: 768px) { .container { max-width: 600px; padding: 2rem; } }
         .card {
-            background-color: rgba(255, 255, 255, 0.9);
+            background-color: var(--card-bg);
             backdrop-filter: blur(10px);
             border-radius: 2rem;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05), 0 2px 10px rgba(0, 0, 0, 0.03);
             padding: 2rem;
             width: 100%;
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-            border: 1px solid rgba(240, 244, 249, 0.5);
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, background-color 0.3s ease-in-out;
+            border: 1px solid var(--card-border);
             animation: fadeIn 0.5s ease-in-out;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08), 0 5px 20px rgba(0, 0, 0, 0.05);
-        }
-        .hidden {
-            display: none;
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0, 0, 0, 0.08), 0 5px 20px rgba(0, 0, 0, 0.05); }
+        .hidden { display: none; }
         .form-input {
-            width: 100%;
-            padding: 1rem;
-            border-radius: 1rem;
-            border: 1px solid #e2e8f0;
-            outline: none;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            width: 100%; padding: 1rem; border-radius: 1rem;
+            border: 1px solid var(--input-border);
+            background-color: var(--input-bg);
+            color: var(--text-primary);
+            outline: none; transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
-        .form-input:focus {
-            border-color: #8b5cf6;
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
-        }
+        .form-input::placeholder { color: var(--text-secondary); }
+        .form-input:focus { border-color: #8b5cf6; box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2); }
         .btn-primary {
             background: linear-gradient(90deg, #A0278A, #D84281);
-            color: #fff;
-            padding: 1rem 2rem;
-            border-radius: 1rem;
-            font-weight: 600;
-            transition: background 0.3s ease, transform 0.2s ease;
-            cursor: pointer;
+            color: #fff; padding: 1rem 2rem; border-radius: 1rem; font-weight: 600;
+            transition: background 0.3s ease, transform 0.2s ease; cursor: pointer;
             box-shadow: 0 4px 10px rgba(160, 39, 138, 0.3);
         }
-        .btn-primary:hover {
-            background: linear-gradient(90deg, #8a2276, #c23871);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(160, 39, 138, 0.4);
-        }
+        .btn-primary:hover { background: linear-gradient(90deg, #8a2276, #c23871); transform: translateY(-2px); box-shadow: 0 6px 15px rgba(160, 39, 138, 0.4); }
         .btn-secondary {
-            background-color: #e2e8f0;
-            color: #4a5568;
-            padding: 1rem 2rem;
-            border-radius: 1rem;
-            font-weight: 600;
-            transition: background-color 0.2s ease, transform 0.2s ease;
-            cursor: pointer;
+            background-color: var(--btn-secondary-bg);
+            color: var(--btn-secondary-text); padding: 1rem 2rem; border-radius: 1rem; font-weight: 600;
+            transition: background-color 0.2s ease, transform 0.2s ease; cursor: pointer;
         }
-        .btn-secondary:hover {
-            background-color: #cbd5e1;
-            transform: translateY(-2px);
-        }
-        .loader-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 150px;
-        }
-        .loader-dots {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-        }
-        .loader-dot {
-            width: 12px;
-            height: 12px;
-            background-color: #A0278A;
-            border-radius: 50%;
-            animation: pulse-dot 1.5s infinite ease-in-out;
-        }
-        .loader-dot:nth-child(2) { animation-delay: 0.5s; }
-        .loader-dot:nth-child(3) { animation-delay: 1s; }
+        .btn-secondary:hover { background-color: var(--btn-secondary-hover-bg); transform: translateY(-2px); }
+        .loader-container { display: flex; flex-direction: column; align-items: center; justify-content: center; }
 
-        @keyframes pulse-dot {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.5); opacity: 0.5; }
+        /* Mascot Animation */
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-15px);
+            }
         }
-        .loading-text-container {
-            height: 32px;
-            overflow: hidden;
-            text-align: center;
+        .mascot-loading-animation {
+            animation: bounce 1s infinite ease-in-out;
         }
-        .loading-text-container p {
-            animation: typing-text 8s infinite ease-in-out;
-            font-size: 1.5rem;
-            font-weight: 600;
-        }
-        @keyframes typing-text {
-            0% { transform: translateY(0); }
-            12.5% { transform: translateY(-32px); }
-            25% { transform: translateY(-64px); }
-            37.5% { transform: translateY(-96px); }
-            50% { transform: translateY(-128px); }
-            62.5% { transform: translateY(-160px); }
-            75% { transform: translateY(-192px); }
-            87.5% { transform: translateY(-224px); }
-            100% { transform: translateY(-256px); }
-        }
-        
-        .overview-header {
-            background: linear-gradient(45deg, #D84281, #A0278A);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-size: 2.5rem;
-            font-weight: 700;
-            line-height: 1.2;
-        }
-        @media (min-width: 768px) {
-             .overview-header { font-size: 3rem; }
-        }
+
+        .loading-text-container { height: 32px; overflow: hidden; text-align: center; }
+        .loading-text-container p { animation: typing-text 8s infinite ease-in-out; font-size: 1.5rem; font-weight: 600; color: var(--text-secondary); }
+        @keyframes typing-text { 0% { transform: translateY(0); } 12.5% { transform: translateY(-32px); } 25% { transform: translateY(-64px); } 37.5% { transform: translateY(-96px); } 50% { transform: translateY(-128px); } 62.5% { transform: translateY(-160px); } 75% { transform: translateY(-192px); } 87.5% { transform: translateY(-224px); } 100% { transform: translateY(-256px); } }
+        .overview-header { background: linear-gradient(45deg, #D84281, #A0278A); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 2.5rem; font-weight: 700; line-height: 1.2; }
+        @media (min-width: 768px) { .overview-header { font-size: 3rem; } }
         .action-item {
-            background-color: #f7f9fc;
-            border-left: 5px solid #D84281;
-            border-radius: 0.75rem;
-            padding: 1rem 1.5rem;
-            margin-bottom: 1rem;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            background-color: var(--action-item-bg);
+            border-left: 5px solid var(--action-item-border); border-radius: 0.75rem; padding: 1rem 1.5rem;
+            margin-bottom: 1rem; transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
         }
-        .action-item:hover {
-            transform: translateX(5px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-        }
-        .action-item-owner {
+        .action-item:hover { transform: scale(1.02); box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); }
+        .action-item-owner { cursor: pointer; text-decoration: none; color: #8b5cf6; transition: color 0.2s ease; }
+        .action-item-owner:hover { text-decoration: underline; color: #6d28d9; }
+        .tag { background-color: var(--tag-bg); color: var(--tag-text); padding: 0.25rem 0.75rem; border-radius: 9999px; font-size: 0.8rem; font-weight: 600; }
+        .message-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.4); display: flex; align-items: center; justify-content: center; z-index: 100; }
+        .message-content { background-color: var(--modal-bg); padding: 2rem; border-radius: 1rem; text-align: center; box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1); }
+        .overview-box { background-color: var(--overview-box-bg); }
+
+        /* Dark Mode Toggle */
+        .theme-switch-wrapper { display: flex; align-items: center; position: absolute; top: 20px; right: 20px; z-index: 50;}
+        .theme-switch { display: inline-block; height: 34px; position: relative; width: 60px; }
+        .theme-switch input { display:none; }
+        .slider { background-color: #ccc; bottom: 0; cursor: pointer; left: 0; position: absolute; right: 0; top: 0; transition: .4s; }
+        .slider:before { background-color: #fff; bottom: 4px; content: ""; height: 26px; left: 4px; position: absolute; transition: .4s; width: 26px; }
+        input:checked + .slider { background-color: #8b5cf6; }
+        input:checked + .slider:before { transform: translateX(26px); }
+        .slider.round { border-radius: 34px; }
+        .slider.round:before { border-radius: 50%; }
+        .theme-switch-wrapper i { margin: 0 8px; font-size: 1.2rem; color: var(--text-secondary); }
+
+        /* History Styles */
+        .history-item {
+            background-color: var(--btn-secondary-bg);
+            color: var(--btn-secondary-text);
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
             cursor: pointer;
-            text-decoration: none;
-            color: #8b5cf6;
-            transition: color 0.2s ease;
-        }
-        .action-item-owner:hover {
-            text-decoration: underline;
-            color: #6d28d9;
-        }
-        .tag {
-            background-color: #fce8f8;
-            color: #A0278A;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-        .message-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.4);
+            transition: background-color 0.2s ease, transform 0.2s ease;
+            text-align: left;
+            font-size: 0.9rem;
             display: flex;
             align-items: center;
-            justify-content: center;
-            z-index: 100;
+            gap: 0.5rem;
         }
-        .message-content {
-            background-color: #fff;
-            padding: 2rem;
-            border-radius: 1rem;
-            text-align: center;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        .history-item:hover {
+            background-color: var(--btn-secondary-hover-bg);
+            transform: translateX(3px);
         }
-        .action-item {
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-        }
-
-        .action-item:hover {
-            transform: scale(1.02);
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        .history-item .link-text {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
     </style>
 </head>
 <body>
+    <div class="theme-switch-wrapper">
+        <i class="fas fa-sun"></i>
+        <label class="theme-switch" for="darkModeToggle">
+            <input type="checkbox" id="darkModeToggle"/>
+            <span class="slider round"></span>
+        </label>
+        <i class="fas fa-moon"></i>
+    </div>
+
     <div class="container">
-        <!-- Giao diện chính: Nhập link -->
+        <!-- Main UI: Input Link -->
         <div id="mainUI" class="card text-center transition-opacity duration-500">
              <div class="flex justify-center mb-8">
                 <img src="https://img.mservice.com.vn/app/img/portal_documents/mini-app_design-guideline_branding-guide-1-2.png" alt="GenNote AI Logo" class="h-96 w-auto">
+             </div>
+             <h1 class="sr-only">GenNote AI</h1>
+             <p class="text-base sm:text-lg text-gray-600 dark:text-gray-400 mb-8">Dán link Google Meet hoặc link Drive để AI tự động tóm tắt.</p>
+             <div class="mb-6">
+                 <input type="text" id="meetLinkInput" class="form-input" placeholder="Ví dụ: https://meet.google.com/... hoặc https://drive.google.com/...">
+             </div>
+             <button id="processBtn" class="btn-primary">Xử lý và Tóm tắt</button>
+
+             <!-- History Section -->
+             <div id="historySection" class="mt-8 w-full hidden">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300">Lịch sử</h3>
+                    <button id="clearHistoryBtn" class="text-sm text-purple-600 hover:text-purple-800 dark:hover:text-purple-400 font-medium transition">Xóa lịch sử</button>
+                </div>
+                <ul id="historyList" class="space-y-2">
+                    <!-- History items will be injected here -->
+                </ul>
             </div>
-            <h1 class="sr-only">GenNote AI</h1>
-            <p class="text-base sm:text-lg text-gray-600 mb-8">Dán link Google Meet hoặc link Drive để AI tự động tóm tắt.</p>
-            <div class="mb-6">
-                <input type="text" id="meetLinkInput" class="form-input" placeholder="Ví dụ: https://meet.google.com/... hoặc https://drive.google.com/... hoặc https://docs.google.com/videos/...">
-            </div>
-            <button id="processBtn" class="btn-primary">Xử lý và Tóm tắt</button>
         </div>
 
-        <!-- Trạng thái Loading -->
+        <!-- Loading State -->
         <div id="loadingUI" class="hidden card text-center flex flex-col items-center justify-center transition-opacity duration-500">
-            <div class="flex justify-center mb-8">
-                 <img src="https://img.mservice.com.vn/app/img/portal_documents/mini-app_design-guideline_branding-guide-1-2.png" alt="GenNote AI Logo" class="h-[100px] w-auto">
-            </div>
-            <div class="loader-container">
-                <div class="loader-dots">
-                    <div class="loader-dot"></div>
-                    <div class="loader-dot"></div>
-                    <div class="loader-dot"></div>
-                </div>
-                <div class="loading-text-container">
-                    <p class="text-gray-600 font-medium">Đang lắng nghe...</p>
-                    <p class="text-gray-600 font-medium">Đang phân tích...</p>
-                    <p class="text-gray-600 font-medium">Đang trích xuất ý chính...</p>
-                    <p class="text-gray-600 font-medium">Đang tạo các mục hành động...</p>
-                    <p class="text-gray-600 font-medium">Đang tổng hợp tóm tắt...</p>
-                    <p class="text-gray-600 font-medium">Đang định dạng lại...</p>
-                    <p class="text-gray-600 font-medium">Đang hoàn tất...</p>
-                    <p class="text-gray-600 font-medium">Sắp xong rồi... Vui lòng đợi trong giây lát!</p>
-                </div>
-            </div>
+             <div class="flex justify-center mb-6">
+                  <img src="https://img.mservice.com.vn/app/img/portal_documents/mini-app_design-guideline_branding-guide-1-2.png" alt="Mascot đang xử lý" class="h-[120px] w-auto mascot-loading-animation">
+             </div>
+             <div class="loader-container mt-4" style="height: auto;">
+                 <div class="loading-text-container">
+                     <p>Đang lắng nghe...</p>
+                     <p>Đang phân tích...</p>
+                     <p>Đang trích xuất ý chính...</p>
+                     <p>Đang tạo các mục hành động...</p>
+                     <p>Đang tổng hợp tóm tắt...</p>
+                     <p>Đang định dạng lại...</p>
+                     <p>Đang hoàn tất...</p>
+                     <p>Sắp xong rồi... Vui lòng đợi!</p>
+                 </div>
+             </div>
         </div>
 
-        <!-- Giao diện Tổng quan và Chia sẻ -->
+        <!-- Overview and Share UI -->
         <div id="overviewSection" class="hidden card transition-opacity duration-500">
              <div class="flex justify-center mb-8">
-                <img src="https://img.mservice.com.vn/app/img/portal_documents/mini-app_design-guideline_branding-guide-1-2.png" alt="GenNote AI Logo" class="h-[250px] w-auto">
-            </div>
-            <h2 class="overview-header mb-4 text-3xl sm:text-4xl">Tóm tắt Cuộc họp</h2>
-            <div id="overviewContent" class="prose max-w-none mb-6">
-                <!-- Nội dung sẽ được tạo tại đây -->
-            </div>
-            <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-4">
-                <button id="backToHomeBtn" class="btn-secondary">Ghi chú Mới</button>
-                <button id="sendToChatBtn" class="btn-primary">Gửi vào Group Chat</button>
-            </div>
+                 <img src="https://img.mservice.com.vn/app/img/portal_documents/mini-app_design-guideline_branding-guide-1-2.png" alt="GenNote AI Logo" class="h-[250px] w-auto">
+             </div>
+             <h2 class="overview-header mb-4 text-3xl sm:text-4xl">Tóm tắt Cuộc họp</h2>
+             <div id="overviewContent" class="prose max-w-none mb-6">
+                 <!-- Content will be generated here -->
+             </div>
+             <div class="flex flex-col sm:flex-row justify-end space-y-2 sm:space-y-0 sm:space-x-4">
+                 <button id="backToHomeBtn" class="btn-secondary">Ghi chú Mới</button>
+                 <button id="sendToChatBtn" class="btn-primary">Gửi vào Group Chat</button>
+             </div>
         </div>
     </div>
 
-    <!-- Modal thông báo tùy chỉnh -->
+    <!-- Custom Message Modal -->
     <div id="messageModal" class="message-modal hidden">
         <div class="message-content">
-            <p id="messageText" class="mb-4 text-gray-700"></p>
+            <p id="messageText" class="mb-4"></p>
             <button id="closeModalBtn" class="btn-primary">Đóng</button>
         </div>
     </div>
@@ -278,6 +248,10 @@
             const backToHomeBtn = document.getElementById('backToHomeBtn');
             const sendToChatBtn = document.getElementById('sendToChatBtn');
             const closeModalBtn = document.getElementById('closeModalBtn');
+            const darkModeToggle = document.getElementById('darkModeToggle');
+            const historySection = document.getElementById('historySection');
+            const historyList = document.getElementById('historyList');
+            const clearHistoryBtn = document.getElementById('clearHistoryBtn');
 
             const mainUI = document.getElementById('mainUI');
             const loadingUI = document.getElementById('loadingUI');
@@ -287,205 +261,147 @@
             const overviewContent = document.getElementById('overviewContent');
             const messageModal = document.getElementById('messageModal');
             const messageText = document.getElementById('messageText');
-            const loadingText = document.getElementById('loadingText');
 
             let generatedData = null;
 
+            // --- Dark Mode Logic ---
+            const currentTheme = localStorage.getItem('theme');
+            if (currentTheme) {
+                document.documentElement.classList.add(currentTheme);
+                if (currentTheme === 'dark') {
+                    darkModeToggle.checked = true;
+                }
+            }
+
+            darkModeToggle.addEventListener('change', () => {
+                if (darkModeToggle.checked) {
+                    document.documentElement.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    localStorage.setItem('theme', 'light');
+                }
+            });
+            // --- End Dark Mode Logic ---
+
+            // --- History Logic ---
+            function saveHistory(link, data) {
+                let history = JSON.parse(localStorage.getItem('gennote_history')) || [];
+                history = history.filter(item => item.link !== link);
+                history.unshift({ 
+                    link: link, 
+                    data: data,
+                    timestamp: new Date().toISOString() 
+                });
+                if (history.length > 5) history.pop();
+                localStorage.setItem('gennote_history', JSON.stringify(history));
+            }
+
+            function formatTimestamp(isoString) {
+                const date = new Date(isoString);
+                const time = date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', hour12: false });
+                const day = date.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+                return `${time} ngày ${day}`;
+            }
+
+            function renderHistory() {
+                const history = JSON.parse(localStorage.getItem('gennote_history')) || [];
+                if (history.length === 0) {
+                    historySection.classList.add('hidden');
+                    return;
+                }
+                historySection.classList.remove('hidden');
+                historyList.innerHTML = '';
+                history.forEach((historyItem, index) => {
+                    const li = document.createElement('li');
+                    li.className = 'history-item';
+                    li.title = historyItem.link;
+                    li.dataset.historyIndex = index;
+                    
+                    const timestampSpan = `<span class="font-semibold text-purple-600 dark:text-purple-400 whitespace-nowrap">${formatTimestamp(historyItem.timestamp)}:</span>`;
+                    const linkSpan = `<span class="link-text text-gray-600 dark:text-gray-400 ml-2">${historyItem.link}</span>`;
+                    li.innerHTML = timestampSpan + linkSpan;
+
+                    li.addEventListener('click', () => {
+                        const clickedIndex = parseInt(li.dataset.historyIndex, 10);
+                        const clickedHistoryItem = history[clickedIndex];
+                        if (clickedHistoryItem && clickedHistoryItem.data) {
+                            generatedData = clickedHistoryItem.data;
+                            renderSummary(clickedHistoryItem.data);
+                            mainUI.classList.add('hidden');
+                            loadingUI.classList.add('hidden');
+                            overviewSection.classList.remove('hidden');
+                        }
+                    });
+                    historyList.appendChild(li);
+                });
+            }
+
+            clearHistoryBtn.addEventListener('click', () => {
+                localStorage.removeItem('gennote_history');
+                renderHistory();
+            });
+
+            // Initial render
+            renderHistory();
+            // --- End History Logic ---
+
+
             processBtn.addEventListener('click', async () => {
                 const meetLink = meetLinkInput.value.trim();
-                if (meetLink === '' || (!meetLink.includes('meet.google.com') && !meetLink.includes('drive.google.com/file/d/') && !meetLink.includes('docs.google.com/videos/d/'))) {
+                if (meetLink === '' || (!meetLink.includes('meet.google.com') && !meetLink.includes('drive.google.com'))) {
                     showMessage('Vui lòng nhập một đường link Google Meet hoặc Google Drive hợp lệ.');
+                    return;
+                }
+                
+                const history = JSON.parse(localStorage.getItem('gennote_history')) || [];
+                const existingEntry = history.find(item => item.link === meetLink);
+                if (existingEntry) {
+                    showMessage('Link này đã có trong lịch sử. Vui lòng nhấn vào mục lịch sử để xem lại.');
                     return;
                 }
 
                 mainUI.classList.add('hidden');
                 loadingUI.classList.remove('hidden');
+                historySection.classList.add('hidden');
 
                 try {
                     const apiData = await fetchSummaryFromAPI(meetLink);
                     generatedData = apiData;
+                    saveHistory(meetLink, apiData);
                     renderSummary(apiData);
 
                 } catch (error) {
-                    console.error("Lỗi khi xử lý tóm tắt:", error);
+                    console.error("Error processing summary:", error);
                     showMessage('Đã xảy ra lỗi khi tạo tóm tắt. Vui lòng thử lại.');
                     loadingUI.classList.add('hidden');
                     mainUI.classList.remove('hidden');
+                    renderHistory();
                 }
             });
-
-            const allTasks = [
-                "[BILLPAY-1101] Revamp Home 2025",
-                "[BILLPAY-1102] Optimize luồng retry payment",
-                "[BILLPAY-1103] New auto check pending",
-                "[BILLPAY-1104] New auto check pending EVN_HN, EVN_NPC",
-                "[BILLPAY-1105] Luồng ĐKNTCC EVN SPC (Phase 1)",
-                "[BILLPAY-1106] Revamp KQGD",
-                "[BILLPAY-1107] Auto debit luồng check pending",
-                "[BILLPAY-1108] Apply check pending cho EVN Hà Nội & EVNNPC cuối ngày T+1",
-                "[BILLPAY-1109] Apply errorCode 01 luồng retry payment cho VNPT toàn quốc & Vina HCM",
-                "[BILLPAY-1110] Chặn luồng xoá bill chính chủ VTS",
-                "[BILLPAY-1111] Support Moni tích hợp API So sánh hoá đơn",
-                "[BILLPAY-1112] Internet Lắp đặt FPT - Update gói combo",
-                "[BILLPAY-1113] Internet Lắp đặt FPT - Update gói camera",
-                "[BILLPAY-1114] Mở mass job auto check pending",
-                "[BILLPAY-1115] Testing N2MM",
-                "[BILLPAY-1116] Hot fix So sánh cùng khu vực",
-                "[BILLPAY-1117] Event tracking BTS đổi hạn mức Auto debit",
-                "[BILLPAY-1118] Fix lỗi UI miniApp Đăng ký lắp đặt internet FPT",
-                "[BILLPAY-1119] BTS thay đổi hạn mức AD",
-                "[BILLPAY-1120] Revamp Add Bill Nhập mã KH",
-                "[BILLPAY-1121] Upgrade remind + noti",
-                "[BILLPAY-1122] New implement remind AI + A/B test bill ranking",
-                "[BILLPAY-1123] Optimize location của internet FPT & Viettel",
-                "[BILLPAY-1124] AD update MH TTAT & KQGD",
-                "[BILLPAY-1125] Revamp Add Bill chọn NCC",
-                "[BILLPAY-1126] Revamp Add Bill Bill detail",
-                "[BILLPAY-1127] Field ngày hết hạn",
-                "[BILLPAY-1128] Optimize cron job",
-                "[BILLPAY-1129] Update project to JDK 17",
-                "[BILLPAY-1130] Billpay on web",
-                "[BILLPAY-1131] ADD BILL AI phase 2",
-                "[BILLPAY-1132] Viettel Thanh toán toàn bộ nợ cước",
-                "[BILLPAY-1133] Tối ưu performance bottom sheet Biz page",
-                "[BILLPAY-1134] Phân tải NCC VDS, CDS",
-                "[BILLPAY-1135] Update saved bill + button Viettel",
-                "[BILLPAY-1136] Improve Biz Page Đăng ký nhận tin- Điều chỉnh UI",
-                "[BILLPAY-1137] Lắp đặt internet FPT - Update thông tin tỉnh/quận/phường",
-                "[BILLPAY-1138] Xác thực sinh trắc học NFC _ Phase 3",
-                "[BILLPAY-1139] Chuyển config từ global config về config webadmin.",
-                "[BILLPAY-1140] Bổ sung popup nâng hạng, giải vàng, giải bạch kim của game",
-                "[BILLPAY-1141] GTBB via MoMo Chat",
-                "[BILLPAY-1142] Optimize auto debit",
-                "[BILLPAY-1143] Optimize API get vip game, giảm thời gian xử lý",
-                "[BILLPAY-1144] Đăng ký lắp đặt Internet_Bổ sung thông tin lắp đặt Internet trên CRM",
-                "[BILLPAY-1145] Move API FIND_RECEIVER_PROFILE qua gateway p2p",
-                "[BILLPAY-1146] Nhắc nợ chủ động",
-                "[BILLPAY-1147] Bổ sung duedate ở Home Billpay và Bill detail",
-                "[BILLPAY-1148] Backfill data bill amount",
-                "[BILLPAY-1149] Báo cáo hóa đơn",
-                "[BILLPAY-1150] Báo lịch cắt/mở điện",
-                "[BILLPAY-1151] Auto setup time of Game",
-                "[BILLPAY-1152] Lỗi P03 crash app do màn hình on-boarding share bill",
-                "[BILLPAY-1153] Plan optimize performance",
-                "[BILLPAY-1154] Auto debit Viettel",
-                "[BILLPAY-1155] Share bill mở thêm dịch vụ internet, truyền hình",
-                "[BILLPAY-1156] EVN CPC nhắc nợ chủ động",
-                "[BILLPAY-1157] Multi bill luồng thu phí khác",
-                "[BILLPAY-1158] VTS phase 2 trả góp",
-                "[BILLPAY-1159] Báo cáo hóa đơn, so sánh cùng khu vực",
-                "[BILLPAY-1160] Mở Autodebit full service",
-                "[BILLPAY-1161] Game Update content nhiệm vụ",
-                "[BILLPAY-1162] Update project to JDK17",
-                "[BILLPAY-1163] Chuyển đổi luồng đối soát từ VM lên K8S",
-                "[BILLPAY-1164] App Platform ver 5.0",
-                "[BILLPAY-1165] Build Web Admin Billpay",
-                "[BILLPAY-1166] Build feature monitor/checking HM trên Web Admin Billpay",
-                "[BILLPAY-1167] Xử lý list gd pending check bill manual EVN HANOI",
-                "[BILLPAY-1168] Appy luồng retry payment cho EVN NINHTHUAN",
-                "[BILLPAY-1169] EVN SPC - Check List GD lệch trạng thái",
-                "[BILLPAY-1170] EVN SPC - Update status pending thành failled cho mã lỗi -1",
-                "[BILLPAY-1171] EVN SPC - Review & nghiệm thu luồng TraCuuThanhToan",
-                "[BILLPAY-1172] Tích hợp API check pending CITYWORK",
-                "[BILLPAY-1173] Upgrade API mới DAWACO",
-                "[BILLPAY-1174] Update API Nước Tân Hòa",
-                "[BILLPAY-1175] Update mã KH mới phumy_water",
-                "[BILLPAY-1176] Update tên dịch vụ yenbai_water",
-                "[BILLPAY-1177] Optimize luồng đối soát tự động VNPT toàn quốc",
-                "[BILLPAY-1178] Review các dịch vụ và OFF tính năng Remind",
-                "[BILLPAY-1179] Kết nối mới Nước sạch Việt Thanh",
-                "[BILLPAY-1180] EVNSPC - Update logic map agent theo mã đơn vị mới",
-                "[BILLPAY-1181] Bổ sung đơn vị mới EVN SPC"
-            ];
-            const tasksByTag = {
-                'backend': allTasks.filter(task => task.includes('- BE') || task.includes('System') || task.includes('Platform')),
-                'app': allTasks.filter(task => task.includes('- APP') || task.includes('- FE') || task.includes('Platform')),
-                'qa': allTasks.filter(task => task.includes('- QC')),
-                'general': allTasks.filter(task => !task.includes('- BE') && !task.includes('- APP') && !task.includes('- FE') && !task.includes('- QC') && !task.includes('System') && !task.includes('Platform'))
-            };
-
-            const peopleByRole = {
-                'backend': ["Phú", "Phúc", "Bão", "Hoàng"],
-                'app': ["Hiền", "Tiến"],
-                'qa': ["Ánh", "Khải"],
-                'leader': ["Nghĩa"]
-            };
+            
+            // --- Mock Data and Functions ---
+            const allTasks = [ "[BILLPAY-1101] Revamp Home 2025", "[BILLPAY-1102] Optimize luồng retry payment", "[BILLPAY-1103] New auto check pending", "[BILLPAY-1104] New auto check pending EVN_HN, EVN_NPC", "[BILLPAY-1105] Luồng ĐKNTCC EVN SPC (Phase 1)", "[BILLPAY-1106] Revamp KQGD", "[BILLPAY-1107] Auto debit luồng check pending", "[BILLPAY-1108] Apply check pending cho EVN Hà Nội & EVNNPC cuối ngày T+1", "[BILLPAY-1109] Apply errorCode 01 luồng retry payment cho VNPT toàn quốc & Vina HCM", "[BILLPAY-1110] Chặn luồng xoá bill chính chủ VTS", "[BILLPAY-1111] Support Moni tích hợp API So sánh hoá đơn", "[BILLPAY-1112] Internet Lắp đặt FPT - Update gói combo", "[BILLPAY-1113] Internet Lắp đặt FPT - Update gói camera", "[BILLPAY-1114] Mở mass job auto check pending", "[BILLPAY-1115] Testing N2MM", "[BILLPAY-1116] Hot fix So sánh cùng khu vực", "[BILLPAY-1117] Event tracking BTS đổi hạn mức Auto debit", "[BILLPAY-1118] Fix lỗi UI miniApp Đăng ký lắp đặt internet FPT", "[BILLPAY-1119] BTS thay đổi hạn mức AD", "[BILLPAY-1120] Revamp Add Bill Nhập mã KH", "[BILLPAY-1121] Upgrade remind + noti", "[BILLPAY-1122] New implement remind AI + A/B test bill ranking", "[BILLPAY-1123] Optimize location của internet FPT & Viettel", "[BILLPAY-1124] AD update MH TTAT & KQGD", "[BILLPAY-1125] Revamp Add Bill chọn NCC", "[BILLPAY-1126] Revamp Add Bill Bill detail", "[BILLPAY-1127] Field ngày hết hạn", "[BILLPAY-1128] Optimize cron job", "[BILLPAY-1129] Update project to JDK 17", "[BILLPAY-1130] Billpay on web", "[BILLPAY-1131] ADD BILL AI phase 2", "[BILLPAY-1132] Viettel Thanh toán toàn bộ nợ cước", "[BILLPAY-1133] Tối ưu performance bottom sheet Biz page", "[BILLPAY-1134] Phân tải NCC VDS, CDS", "[BILLPAY-1135] Update saved bill + button Viettel", "[BILLPAY-1136] Improve Biz Page Đăng ký nhận tin- Điều chỉnh UI", "[BILLPAY-1137] Lắp đặt internet FPT - Update thông tin tỉnh/quận/phường", "[BILLPAY-1138] Xác thực sinh trắc học NFC _ Phase 3", "[BILLPAY-1139] Chuyển config từ global config về config webadmin.", "[BILLPAY-1140] Bổ sung popup nâng hạng, giải vàng, giải bạch kim của game", "[BILLPAY-1141] GTBB via MoMo Chat", "[BILLPAY-1142] Optimize auto debit", "[BILLPAY-1143] Optimize API get vip game, giảm thời gian xử lý", "[BILLPAY-1144] Đăng ký lắp đặt Internet_Bổ sung thông tin lắp đặt Internet trên CRM", "[BILLPAY-1145] Move API FIND_RECEIVER_PROFILE qua gateway p2p", "[BILLPAY-1146] Nhắc nợ chủ động", "[BILLPAY-1147] Bổ sung duedate ở Home Billpay và Bill detail", "[BILLPAY-1148] Backfill data bill amount", "[BILLPAY-1149] Báo cáo hóa đơn", "[BILLPAY-1150] Báo lịch cắt/mở điện", "[BILLPAY-1151] Auto setup time of Game", "[BILLPAY-1152] Lỗi P03 crash app do màn hình on-boarding share bill", "[BILLPAY-1153] Plan optimize performance", "[BILLPAY-1154] Auto debit Viettel", "[BILLPAY-1155] Share bill mở thêm dịch vụ internet, truyền hình", "[BILLPAY-1156] EVN CPC nhắc nợ chủ động", "[BILLPAY-1157] Multi bill luồng thu phí khác", "[BILLPAY-1158] VTS phase 2 trả góp", "[BILLPAY-1159] Báo cáo hóa đơn, so sánh cùng khu vực", "[BILLPAY-1160] Mở Autodebit full service", "[BILLPAY-1161] Game Update content nhiệm vụ", "[BILLPAY-1162] Update project to JDK17", "[BILLPAY-1163] Chuyển đổi luồng đối soát từ VM lên K8S", "[BILLPAY-1164] App Platform ver 5.0", "[BILLPAY-1165] Build Web Admin Billpay", "[BILLPAY-1166] Build feature monitor/checking HM trên Web Admin Billpay", "[BILLPAY-1167] Xử lý list gd pending check bill manual EVN HANOI", "[BILLPAY-1168] Appy luồng retry payment cho EVN NINHTHUAN", "[BILLPAY-1169] EVN SPC - Check List GD lệch trạng thái", "[BILLPAY-1170] EVN SPC - Update status pending thành failled cho mã lỗi -1", "[BILLPAY-1171] EVN SPC - Review & nghiệm thu luồng TraCuuThanhToan", "[BILLPAY-1172] Tích hợp API check pending CITYWORK", "[BILLPAY-1173] Upgrade API mới DAWACO", "[BILLPAY-1174] Update API Nước Tân Hòa", "[BILLPAY-1175] Update mã KH mới phumy_water", "[BILLPAY-1176] Update tên dịch vụ yenbai_water", "[BILLPAY-1177] Optimize luồng đối soát tự động VNPT toàn quốc", "[BILLPAY-1178] Review các dịch vụ và OFF tính năng Remind", "[BILLPAY-1179] Kết nối mới Nước sạch Việt Thanh", "[BILLPAY-1180] EVNSPC - Update logic map agent theo mã đơn vị mới", "[BILLPAY-1181] Bổ sung đơn vị mới EVN SPC" ];
+            const tasksByTag = { 'backend': allTasks.filter(task => task.includes('- BE') || task.includes('System') || task.includes('Platform')), 'app': allTasks.filter(task => task.includes('- APP') || task.includes('- FE') || task.includes('Platform')), 'qa': allTasks.filter(task => task.includes('- QC')), 'general': allTasks.filter(task => !task.includes('- BE') && !task.includes('- APP') && !task.includes('- FE') && !task.includes('- QC') && !task.includes('System') && !task.includes('Platform')) };
+            const peopleByRole = { 'backend': ["Phú", "Phúc", "Bão", "Hoàng"], 'app': ["Hiền", "Tiến"], 'qa': ["Ánh", "Khải"], 'leader': ["Nghĩa"] };
             const allTeamMembers = [...peopleByRole.backend, ...peopleByRole.app, ...peopleByRole.qa, ...peopleByRole.leader];
-            const chatLinks = {}; // Đã xóa link của Bão
+            const chatLinks = {};
 
-            function getRandomTasksForPerson(role, count) {
-                const availableTasks = tasksByTag[role] || tasksByTag['general'];
-                const shuffled = [...availableTasks].sort(() => 0.5 - Math.random());
-                return shuffled.slice(0, count);
-            }
-
-            function getRandomDate(daysAhead) {
-                const date = new Date();
-                date.setDate(date.getDate() + Math.floor(Math.random() * daysAhead) + 2);
-                return date.toLocaleDateString('vi-VN');
-            }
-
-            async function fetchSummaryFromAPI(link) {
-                const attendingMembers = [...allTeamMembers].sort(() => 0.5 - Math.random());
-                const offMembers = attendingMembers.splice(0, Math.floor(Math.random() * 2) + 1);
-
-                const apiResponse = {
-                    "overview": `Trong cuộc họp Daily Meeting sáng nay, team đã cập nhật tiến độ các task. Mọi người đều rất tập trung vào việc tối ưu luồng thanh toán và nâng cấp giao diện. Đặc biệt, **${offMembers.join(' và ')}** đã vắng mặt vì lý do cá nhân nhưng đã gửi thông tin cập nhật trước. Team đã thống nhất đẩy nhanh tiến độ cho các task quan trọng trong tuần.`,
-                    "actionItems": []
-                };
-
-                attendingMembers.forEach(name => {
-                    let role = 'general';
-                    if (peopleByRole.backend.includes(name)) role = 'backend';
-                    if (peopleByRole.app.includes(name)) role = 'app';
-                    if (peopleByRole.qa.includes(name)) role = 'qa';
-                    if (peopleByRole.leader.includes(name)) role = 'leader';
-
-                    const numTasks = Math.floor(Math.random() * 3) + 1;
-                    const tasks = getRandomTasksForPerson(role, numTasks).map(task => {
-                        return {
-                            task: task,
-                            due: getRandomDate(10),
-                            tag: role
-                        };
-                    });
-
-                    apiResponse.actionItems.push({
-                        owner: name,
-                        tasks: tasks
-                    });
-                });
-
-                // Add off members to actionItems with an empty tasks array
-                offMembers.forEach(name => {
-                    apiResponse.actionItems.push({
-                        owner: name,
-                        tasks: [],
-                        isOff: true
-                    });
-                });
-
-                return new Promise(resolve => {
-                    const loadingTime = Math.random() * 3000 + 5000;
-                    setTimeout(() => {
-                        resolve(apiResponse);
-                    }, loadingTime);
-                });
-            }
+            function getRandomTasksForPerson(role, count) { const availableTasks = tasksByTag[role] || tasksByTag['general']; const shuffled = [...availableTasks].sort(() => 0.5 - Math.random()); return shuffled.slice(0, count); }
+            function getRandomDate(daysAhead) { const date = new Date(); date.setDate(date.getDate() + Math.floor(Math.random() * daysAhead) + 2); return date.toLocaleDateString('vi-VN'); }
+            async function fetchSummaryFromAPI(link) { const attendingMembers = [...allTeamMembers].sort(() => 0.5 - Math.random()); const offMembers = attendingMembers.splice(0, Math.floor(Math.random() * 2) + 1); const apiResponse = { "overview": `Trong cuộc họp Daily Meeting sáng nay, team đã cập nhật tiến độ các task. Mọi người đều rất tập trung vào việc tối ưu luồng thanh toán và nâng cấp giao diện. Đặc biệt, **${offMembers.join(' và ')}** đã vắng mặt vì lý do cá nhân nhưng đã gửi thông tin cập nhật trước. Team đã thống nhất đẩy nhanh tiến độ cho các task quan trọng trong tuần.`, "actionItems": [] }; attendingMembers.forEach(name => { let role = 'general'; if (peopleByRole.backend.includes(name)) role = 'backend'; if (peopleByRole.app.includes(name)) role = 'app'; if (peopleByRole.qa.includes(name)) role = 'qa'; if (peopleByRole.leader.includes(name)) role = 'leader'; const numTasks = Math.floor(Math.random() * 3) + 1; const tasks = getRandomTasksForPerson(role, numTasks).map(task => { return { task: task, due: getRandomDate(10), tag: role }; }); apiResponse.actionItems.push({ owner: name, tasks: tasks }); }); offMembers.forEach(name => { apiResponse.actionItems.push({ owner: name, tasks: [], isOff: true }); }); return new Promise(resolve => { const loadingTime = Math.random() * 3000 + 5000; setTimeout(() => { resolve(apiResponse); }, loadingTime); }); }
 
             function renderSummary(apiData) {
-                const title = `Tóm tắt Cuộc họp - ${new Date().toLocaleDateString('vi-VN')}`;
-                
                 let actionItemsHtml = apiData.actionItems.map(item => {
                     let taskListHtml = '';
                     if (item.isOff) {
-                        taskListHtml = `<p class="text-gray-700 italic">Hôm nay off</p>`;
+                        taskListHtml = `<p class="italic text-gray-500 dark:text-gray-400">Hôm nay off</p>`;
                     } else {
                         const taskList = item.tasks.map(task => `
                             <li>
-                                <p class="text-gray-700 font-semibold text-lg mb-1">${task.task}</p>
-                                <p class="text-sm text-gray-500 mt-2">
-                                    ${task.due ? `Hạn chót: <span class="text-gray-700 font-medium">${task.due}</span>` : ''}
+                                <p class="font-semibold text-lg mb-1">${task.task}</p>
+                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                                    ${task.due ? `Hạn chót: <span class="font-medium text-gray-700 dark:text-gray-300">${task.due}</span>` : ''}
                                     ${task.tag ? `<span class="tag ml-4">#${task.tag}</span>` : ''}
                                 </p>
                             </li>
@@ -493,7 +409,7 @@
                         taskListHtml = `<ul class="list-disc ml-6 space-y-4">${taskList}</ul>`;
                     }
                     
-                    const ownerLink = chatLinks[item.owner] ? chatLinks[item.owner] : `javascript:void(0)`;
+                    const ownerLink = chatLinks[item.owner] || `javascript:void(0)`;
                     const ownerTarget = chatLinks[item.owner] ? '_blank' : '_self';
 
                     return `
@@ -507,14 +423,12 @@
                 }).join('');
 
                 overviewContent.innerHTML = `
-                    <div class="bg-gray-100 p-6 rounded-xl mb-6">
-                        <h3 class="text-2xl font-semibold mb-2 text-gray-800">Tóm tắt</h3>
-                        <p class="text-gray-700 leading-relaxed">${apiData.overview}</p>
+                    <div class="overview-box p-6 rounded-xl mb-6">
+                        <h3 class="text-2xl font-semibold mb-2 text-gray-800 dark:text-gray-200">Tóm tắt</h3>
+                        <p class="text-gray-700 dark:text-gray-300 leading-relaxed">${apiData.overview}</p>
                     </div>
-                    <h4 class="text-xl font-bold mb-4 text-gray-800">Các Mục Hành Động</h4>
-                    <div class="space-y-4">
-                        ${actionItemsHtml}
-                    </div>
+                    <h4 class="text-xl font-bold mb-4 text-gray-800 dark:text-gray-200">Các Mục Hành Động</h4>
+                    <div class="space-y-4">${actionItemsHtml}</div>
                 `;
 
                 loadingUI.classList.add('hidden');
@@ -524,8 +438,8 @@
                     link.addEventListener('click', (e) => {
                         const owner = e.target.dataset.owner;
                         if (!chatLinks[owner]) {
-                             e.preventDefault();
-                             showMessage(`Link chat với ${owner} chưa được thiết lập. Vui lòng thử lại sau.`);
+                            e.preventDefault();
+                            showMessage(`Link chat với ${owner} chưa được thiết lập.`);
                         }
                     });
                 });
@@ -536,56 +450,23 @@
                 mainUI.classList.remove('hidden');
                 meetLinkInput.value = '';
                 generatedData = null;
+                renderHistory();
             });
 
             sendToChatBtn.addEventListener('click', async () => {
-                if (!generatedData) {
-                    showMessage('Không có dữ liệu để gửi.');
-                    return;
-                }
-
+                if (!generatedData) { showMessage('Không có dữ liệu để gửi.'); return; }
                 const chatApiUrl = "https://chat.googleapis.com/v1/spaces/AAQA4PrNVnA/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=6T6hPn4tmIL4tfe8LJtVCwHL-ZJmkitqy1hDhXTprAs";
-
-                let message = `*Tóm tắt Cuộc họp - ${new Date().toLocaleDateString('vi-VN')}*\n\n` +
-                                 `*Tổng quan:*\n` +
-                                 `${generatedData.overview}\n\n` +
-                                 `*Các Mục Hành Động:*\n`;
-                
-                generatedData.actionItems.forEach(person => {
-                    message += `\n*@${person.owner}*:\n`;
-                    if (person.isOff) {
-                         message += `(Hôm nay off)\n`;
-                    } else {
-                        person.tasks.forEach(task => {
-                            message += `- ${task.task} ` +
-                                          (task.due ? `(Hạn chót: ${task.due}) ` : '') +
-                                          (task.tag ? `[#${task.tag}]` : '') +
-                                          `\n`;
-                        });
-                    }
-                });
-
+                let message = `*Tóm tắt Cuộc họp - ${new Date().toLocaleDateString('vi-VN')}*\n\n` + `*Tổng quan:*\n` + `${generatedData.overview}\n\n` + `*Các Mục Hành Động:*\n`;
+                generatedData.actionItems.forEach(person => { message += `\n*@${person.owner}*:\n`; if (person.isOff) { message += `(Hôm nay off)\n`; } else { person.tasks.forEach(task => { message += `- ${task.task} ` + (task.due ? `(Hạn chót: ${task.due}) ` : '') + (task.tag ? `[#${task.tag}]` : '') + `\n`; }); } });
                 try {
-                    const response = await fetch(chatApiUrl, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ "text": message })
-                    });
-                    if (response.ok) {
-                        showMessage('Đã gửi tóm tắt thành công!');
-                    } else {
-                        throw new Error(`Lỗi khi gửi tin: ${response.status} - ${response.statusText}`);
-                    }
-                } catch (error) {
-                    console.error("Lỗi khi gửi tin nhắn:", error);
-                    showMessage('Lỗi khi gửi tin nhắn. Vui lòng kiểm tra lại URL và quyền truy cập.');
-                }
+                    const response = await fetch(chatApiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json', }, body: JSON.stringify({ "text": message }) });
+                    if (response.ok) { showMessage('Đã gửi tóm tắt thành công!'); } 
+                    else { throw new Error(`Error sending message: ${response.status} - ${response.statusText}`); }
+                } catch (error) { console.error("Error sending message:", error); showMessage('Lỗi khi gửi tin nhắn. Vui lòng kiểm tra lại URL và quyền truy cập.'); }
             });
 
             function showMessage(message) {
-                messageText.innerText = message;
+                messageText.textContent = message;
                 messageModal.classList.remove('hidden');
             }
 
